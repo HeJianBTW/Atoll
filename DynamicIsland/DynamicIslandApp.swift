@@ -511,6 +511,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         
         // If inline sneak peek is active, use a wider width to accommodate the expanded content
         if isInlineSneakPeekActive {
+            if airPodsListeningModeSneakActive {
+                // ContentView expands the AirPods listening-mode HUD beyond the closed
+                // notch. Its host window must use the identical width; otherwise the
+                // SwiftUI content overflows a 460pt panel and appears offset/clipped.
+                let contentWidth = InlineHUD.airPodsListeningModeWidth(
+                    closedNotchWidth: vm.closedNotchSize.width,
+                    gestureProgress: 0,
+                    minimalistic: Defaults[.enableMinimalisticUI]
+                )
+                let closedHorizontalInset = cornerRadiusInsets.closed.bottom
+                return CGSize(
+                    width: contentWidth + closedHorizontalInset * 2,
+                    height: vm.effectiveClosedNotchHeight
+                )
+            }
+
             // Calculate required width for inline sneak peek:
             // Album art (~32) + Middle section (380) + Visualizer (~32) + horizontal padding (28) + clip shape margin (12)
             let inlineSneakPeekWidth: CGFloat = 460

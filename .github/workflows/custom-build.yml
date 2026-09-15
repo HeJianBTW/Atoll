@@ -21,15 +21,15 @@ jobs:
           xcodebuild build
           -project DynamicIsland.xcodeproj
           -scheme DynamicIsland
-          -configuration Release
           -destination 'platform=macOS'
+          PRODUCT_BUNDLE_IDENTIFIER='com.Ebullioscopic.Atoll'
           CODE_SIGN_IDENTITY='-'
           CODE_SIGNING_REQUIRED=NO
           CODE_SIGNING_ALLOWED=YES
           CODE_SIGN_INJECT_BASE_ENTITLEMENTS=YES
       - name: Package app
         run: |
-          APP_PATH=$(find "$HOME/Library/Developer/Xcode/DerivedData" -path '*Build/Products/Release/Atoll.app' -type d -print -quit)
+          APP_PATH=$(find "$HOME/Library/Developer/Xcode/DerivedData" -path '*Build/Products/Debug/Atoll.app' -type d -print -quit)
           test -n "$APP_PATH"
           ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" Atoll-custom.zip
       - uses: actions/upload-artifact@v4

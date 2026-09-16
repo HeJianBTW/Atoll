@@ -1,0 +1,39 @@
+name: Custom Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest-stable
+      - name: Resolve packages
+        run: xcodebuild -resolvePackageDependencies -project DynamicIsland.xcodeproj -scheme DynamicIsland
+      - name: Build
+        run: >-
+          xcodebuild build
+          -project DynamicIsland.xcodeproj
+          -scheme DynamicIsland
+          -destination 'platform=macOS'
+          PRODUCT_BUNDLE_IDENTIFIER='com.Ebullioscopic.Atoll'
+          CODE_SIGN_IDENTITY='-'
+          CODE_SIGNING_REQUIRED=NO
+          CODE_SIGNING_ALLOWED=YES
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS=YES
+      - name: Package app
+        run: |
+          APP_PATH=$(find "$HOME/Library/Developer/Xcode/DerivedData" -path '*Build/Products/Debug/Atoll.app' -type d -print -quit)
+          test -n "$APP_PATH"
+          ditto -c -k --sequesterRsrc --keepParent "$APP_PATH" Atoll-custom.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Atoll-custom
+          path: Atoll-custom.zip
+          retention-days: 7
